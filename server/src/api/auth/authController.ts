@@ -5,10 +5,6 @@ import {
   sendErrorResponse,
   sendSuccessResponse,
 } from "../../utils/standardReponse";
-import {
-  createFirebaseUser,
-  pollEmailVerification,
-} from "../../utils/firebase";
 import bcrypt, { compare, hash } from "bcrypt";
 import { sign } from "jsonwebtoken";
 import { z } from "zod";
@@ -28,14 +24,10 @@ export async function registerController(req: Request, res: Response) {
     // hashing the password
     password = await bcrypt.hash(password, 10);
 
-    //creating a user on firebase and sending email
-    const firebaseUser = await createFirebaseUser(email, password);
 
-    //verifying the email
-    const verified = await pollEmailVerification(firebaseUser, 10, 2000);
 
     //on verifying, save the user to database
-    if (verified) {
+    if (true) {
       const newUser = new User({ email: email, password: password });
       newUser.save();
       sendSuccessResponse(res, 200, "User registered successfully", newUser);
@@ -71,6 +63,7 @@ export async function loginController(req: Request, res: Response) {
       sendErrorResponse(res, 401, "Invalid Credentials");
     }
 
+
     // generating token
     const accessToken = sign(
       {
@@ -79,6 +72,8 @@ export async function loginController(req: Request, res: Response) {
       process.env.JWT_SECRET_KEY!,
       { expiresIn: "45m" }
     );
+
+    console.log("check 1")
 
     sendSuccessResponse(res, 201, "User logged in successfully", accessToken);
   } catch (error) {
